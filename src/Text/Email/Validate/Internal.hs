@@ -54,7 +54,7 @@ instance FromField EmailAddress where
     fromField :: FieldParser EmailAddress
     -- fromField :: Field -> Maybe ByteString -> Conversion EmailAddress
     fromField field Nothing = returnError UnexpectedNull field ""
-    fromField field (Just email) = maybe err pure $ emailAddress email
+    fromField field (Just email) = maybe err return $ emailAddress email
       where
         err :: Conversion EmailAddress
         err = returnError ConversionFailed field $
