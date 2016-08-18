@@ -2,7 +2,7 @@ name:                emailaddress
 version:             0.1.0.0
 synopsis:            Wrapper around email-validate library adding instances for common type classes.
 description:         Please see README.md
-homepage:            https://github.com/cdepillabout/read-env-var#readme
+homepage:            https://github.com/cdepillabout/emailaddress#readme
 license:             BSD3
 license-file:        LICENSE
 author:              Dennis Gosnell
@@ -23,7 +23,7 @@ library
   default-language:    Haskell2010
   ghc-options:         -Wall
 
-test-suite read-env-var-doctest
+test-suite emailaddress-doctest
   type:                exitcode-stdio-1.0
   main-is:             DocTest.hs
   hs-source-dirs:      test
