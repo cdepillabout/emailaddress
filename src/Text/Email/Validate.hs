@@ -1,2 +1,7 @@
+module Text.Email.Validate
+    ( -- * Data Type
+      EmailAddress
+    ) where
 
-module Text.Email.Validate where
+import Text.Email.Validate.Internal
+    ( EmailAddress )
