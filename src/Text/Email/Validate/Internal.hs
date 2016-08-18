@@ -42,7 +42,7 @@ instance Show EmailAddress where
 validate :: ByteString -> Either String EmailAddress
 validate = fmap EmailAddress . EmailValidate.validate
 
--- | Wrapper around 'EmailValidate.emailAddress.
+-- | Wrapper around 'EmailValidate.emailAddress'.
 --
 -- Similar to 'validate', but returns 'Nothing' if the email address fails to
 -- parse.
@@ -71,7 +71,7 @@ unsafeEmailAddress
     -> EmailAddress
 unsafeEmailAddress = (EmailAddress .) . EmailValidate.unsafeEmailAddress
 
--- | Wrapper around 'EmailValidate.localPart.
+-- | Wrapper around 'EmailValidate.localPart'.
 --
 -- Extracts the local part from an email address.
 --
@@ -85,7 +85,7 @@ unsafeEmailAddress = (EmailAddress .) . EmailValidate.unsafeEmailAddress
 localPart :: EmailAddress -> ByteString
 localPart = EmailValidate.localPart . unEmailAddress
 
--- | Wrapper around 'EmailValidate.domainPart.
+-- | Wrapper around 'EmailValidate.domainPart'.
 --
 -- Extracts the domain part from an email address.
 --
@@ -100,7 +100,7 @@ localPart = EmailValidate.localPart . unEmailAddress
 domainPart :: EmailAddress -> ByteString
 domainPart = EmailValidate.domainPart . unEmailAddress
 
--- | Wrapper around 'EmailValidate.toByteString.
+-- | Wrapper around 'EmailValidate.toByteString'.
 --
 -- >>> let email = unsafeEmailAddress "foo" "gmail.com"
 -- >>> email
