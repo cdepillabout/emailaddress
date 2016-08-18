@@ -11,7 +11,12 @@ type has additional typeclass instances, including aeson's
 [ToJSON](https://hackage.haskell.org/package/aeson/docs/Data-Aeson.html#t:ToJSON)
 and
 [FromJSON](https://hackage.haskell.org/package/aeson/docs/Data-Aeson.html#t:FromJSON).
+This allows us to use the `EmailAddress` type without fear of orphan instances.
 
-This module also exposes the module `Text.Email.Validate`, so it can be used as
+This package exposes the module `Text.Email.Validate`, so it can be used as
 a drop-in replacement for
 [`email-validate`](https://hackage.haskell.org/package/email-validate).
+
+If you would like to add new instances for `EmailAddress`, please send a pull
+request.  Any instace for a typeclass from a package in stackage will be
+accepted.
