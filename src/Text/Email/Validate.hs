@@ -11,7 +11,7 @@ from <https://hackage.haskell.org/package/email-validate email-validate>.
 This module exports 'EmailAddress', a newtype wrapper around
 <https://hackage.haskell.org/package/email-validate/docs/Text-Email-Validate.html#t:EmailAddress Text.Email.Validate.EmailAddress>.
 Additional instances are defined for our
-new 'EmailAddress', including 'ToJSON' and 'FromJSON'. This is done so that no
+new 'EmailAddress', including 'Data.Aeson.ToJSON' and 'Data.Aeson.FromJSON'. This is done so that no
 orphan instances need to be used.
 
 If you would like additional instances to be defined, please send a
