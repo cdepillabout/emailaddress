@@ -1,6 +1,8 @@
 {-# LANGUAGE DeriveDataTypeable #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE PackageImports #-}
 
 module Text.Email.Validate.Internal
@@ -15,10 +17,22 @@ module Text.Email.Validate.Internal
     , toByteString
     ) where
 
+import Data.Aeson (FromJSON(..), ToJSON(..), Value(..), withText)
+import Data.Aeson.Types (Parser)
 import Data.ByteString (ByteString)
 import Data.Data (Data)
+import Data.Monoid ((<>))
+import Data.Profunctor (lmap)
+import Data.Profunctor.Product.Default (Default(def))
+import Data.Text.Encoding (decodeUtf8With, encodeUtf8)
+import Data.Text.Encoding.Error (lenientDecode)
+import Database.PostgreSQL.Simple.FromField
+    ( Conversion, FieldParser, FromField(..), ResultError(..), returnError )
 import Data.Typeable (Typeable)
 import GHC.Generics (Generic)
+import Opaleye
+    ( Column, Constant(..), PGText, QueryRunnerColumn
+    , QueryRunnerColumnDefault(..) , fieldQueryRunnerColumn )
 
 import qualified "email-validate" Text.Email.Validate as EmailValidate
 
@@ -31,6 +45,38 @@ newtype EmailAddress = EmailAddress
 instance Show EmailAddress where
     show :: EmailAddress -> String
     show = show . unEmailAddress
+
+instance QueryRunnerColumnDefault PGText EmailAddress where
+    queryRunnerColumnDefault :: QueryRunnerColumn PGText EmailAddress
+    queryRunnerColumnDefault = fieldQueryRunnerColumn
+
+instance FromField EmailAddress where
+    fromField :: FieldParser EmailAddress
+    -- fromField :: Field -> Maybe ByteString -> Conversion EmailAddress
+    fromField field Nothing = returnError UnexpectedNull field ""
+    fromField field (Just email) = maybe err pure $ emailAddress email
+      where
+        err :: Conversion EmailAddress
+        err = returnError ConversionFailed field $
+            "Could not convert " <> show email <> " to email address"
+
+instance Default Constant EmailAddress (Column PGText) where
+    def :: Constant EmailAddress (Column PGText)
+    def = lmap (decodeUtf8With lenientDecode . toByteString) def
+
+-- | Parse 'EmailAddress' from JSON.
+instance FromJSON EmailAddress where
+    parseJSON :: Value -> Parser EmailAddress
+    parseJSON = withText "EmailAddress" $ \t ->
+                    case validate $ encodeUtf8 t of
+                        Left err -> fail $ "Failed to parse email address: " <> err
+                        Right email -> return email
+    {-# INLINE parseJSON #-}
+
+-- | Turn 'EmailAddress' into JSON.
+instance ToJSON EmailAddress where
+    toJSON :: EmailAddress -> Value
+    toJSON = String . decodeUtf8With lenientDecode . toByteString
 
 -- | Wrapper around 'EmailValidate.validate'.
 --
