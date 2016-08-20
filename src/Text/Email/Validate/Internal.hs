@@ -11,21 +11,30 @@ module Text.Email.Validate.Internal
     , EmailValidate.canonicalizeEmail
     , emailAddress
     , validate
+    , emailAddressFromText
+    , validateFromText
     , unsafeEmailAddress
     , localPart
     , domainPart
     , toByteString
+    , toText
     ) where
 
+import Control.Monad ((<=<))
 import Data.Aeson (FromJSON(..), ToJSON(..), Value(..), withText)
 import Data.Aeson.Types (Parser)
+import Data.Bifunctor (first)
 import Data.ByteString (ByteString)
 import Data.Data (Data)
 import Data.Monoid ((<>))
 import Data.Profunctor (lmap)
 import Data.Profunctor.Product.Default (Default(def))
+import Data.Proxy (Proxy(Proxy))
+import Data.Text (Text, pack)
 import Data.Text.Encoding (decodeUtf8With, encodeUtf8)
 import Data.Text.Encoding.Error (lenientDecode)
+import Database.Persist (PersistField(..), PersistValue)
+import Database.Persist.Sql (PersistFieldSql(..), SqlType)
 import Database.PostgreSQL.Simple.FromField
     ( Conversion, FieldParser, FromField(..), ResultError(..), returnError )
 import Data.Typeable (Typeable)
@@ -78,6 +87,17 @@ instance ToJSON EmailAddress where
     toJSON :: EmailAddress -> Value
     toJSON = String . decodeUtf8With lenientDecode . toByteString
 
+instance PersistField EmailAddress where
+    toPersistValue :: EmailAddress -> PersistValue
+    toPersistValue = toPersistValue . toText
+
+    fromPersistValue :: PersistValue -> Either Text EmailAddress
+    fromPersistValue = first pack . validateFromText <=< fromPersistValue
+
+instance PersistFieldSql EmailAddress where
+    sqlType :: Proxy EmailAddress -> SqlType
+    sqlType _ = sqlType (Proxy :: Proxy Text)
+
 -- | Wrapper around 'EmailValidate.validate'.
 --
 -- >>> validate "foo@gmail.com"
@@ -99,6 +119,14 @@ validate = fmap EmailAddress . EmailValidate.validate
 -- Nothing
 emailAddress :: ByteString -> Maybe EmailAddress
 emailAddress = fmap EmailAddress . EmailValidate.emailAddress
+
+-- | Create an 'EmailAddress' from a 'Text' value.  See 'validate'.
+validateFromText :: Text -> Either String EmailAddress
+validateFromText = validate . encodeUtf8
+
+-- | Create an 'EmailAddress' from a 'Text' value.  See 'emailAddress'.
+emailAddressFromText :: Text -> Maybe EmailAddress
+emailAddressFromText = emailAddress . encodeUtf8
 
 -- | Wrapper around 'EmailValidate.unsafeEmailAddress'.
 --
@@ -155,3 +183,15 @@ domainPart = EmailValidate.domainPart . unEmailAddress
 -- "foo@gmail.com"
 toByteString :: EmailAddress -> ByteString
 toByteString = EmailValidate.toByteString . unEmailAddress
+
+-- | Convert an email address to 'Text'.
+--
+-- This assumes the 'EmailAddress' is UTF8-encoded.
+--
+-- >>> let email = unsafeEmailAddress "foo" "gmail.com"
+-- >>> email
+-- "foo@gmail.com"
+-- >>> toText email
+-- "foo@gmail.com"
+toText :: EmailAddress -> Text
+toText = decodeUtf8With lenientDecode . toByteString
