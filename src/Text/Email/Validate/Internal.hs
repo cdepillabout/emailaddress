@@ -87,6 +87,7 @@ instance ToJSON EmailAddress where
     toJSON :: EmailAddress -> Value
     toJSON = String . decodeUtf8With lenientDecode . toByteString
 
+-- | Treat 'EmailAddress' just like a 'Text' value.
 instance PersistField EmailAddress where
     toPersistValue :: EmailAddress -> PersistValue
     toPersistValue = toPersistValue . toText
@@ -94,6 +95,7 @@ instance PersistField EmailAddress where
     fromPersistValue :: PersistValue -> Either Text EmailAddress
     fromPersistValue = first pack . validateFromText <=< fromPersistValue
 
+-- | Treat 'EmailAddress' just like a 'Text' value.
 instance PersistFieldSql EmailAddress where
     sqlType :: Proxy EmailAddress -> SqlType
     sqlType _ = sqlType (Proxy :: Proxy Text)
