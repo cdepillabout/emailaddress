@@ -13,6 +13,8 @@ module Text.Email.Validate.Internal
     , validate
     , emailAddressFromText
     , validateFromText
+    , emailAddressFromString
+    , validateFromString
     , unsafeEmailAddress
     , localPart
     , domainPart
@@ -200,6 +202,14 @@ validateFromText = validate . encodeUtf8
 -- | Create an 'EmailAddress' from a 'Text' value.  See 'emailAddress'.
 emailAddressFromText :: Text -> Maybe EmailAddress
 emailAddressFromText = emailAddress . encodeUtf8
+
+-- | Create an 'EmailAddress' from a 'String' value.  See 'validate'.
+validateFromString :: String -> Either String EmailAddress
+validateFromString = validateFromText . pack
+
+-- | Create an 'EmailAddress' from a 'String' value.  See 'emailAddress'.
+emailAddressFromString :: String -> Maybe EmailAddress
+emailAddressFromString = emailAddressFromText . pack
 
 -- | Wrapper around 'EmailValidate.unsafeEmailAddress'.
 --

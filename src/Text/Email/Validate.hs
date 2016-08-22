@@ -28,6 +28,8 @@ module Text.Email.Validate
     , validate
     , emailAddressFromText
     , validateFromText
+    , emailAddressFromString
+    , validateFromString
       -- * Check validity
     , isValid
       -- * Convert to Text
@@ -44,5 +46,6 @@ module Text.Email.Validate
 
 import Text.Email.Validate.Internal
     ( EmailAddress, canonicalizeEmail, domainPart, emailAddress
-    , emailAddressFromText, isValid, localPart, toByteString, toText, validate
-    , validateFromText, unsafeEmailAddress )
+    , emailAddressFromString, emailAddressFromText, isValid, localPart
+    , toByteString, toText, validate, validateFromString, validateFromText
+    , unsafeEmailAddress )
