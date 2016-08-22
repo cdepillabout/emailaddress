@@ -45,6 +45,7 @@ import Opaleye
 import Text.Read (Read(readPrec), ReadPrec)
 import Web.HttpApiData
     ( FromHttpApiData(parseUrlPiece), ToHttpApiData(toUrlPiece) )
+import Web.PathPieces (PathPiece(fromPathPiece, toPathPiece))
 
 import qualified "email-validate" Text.Email.Validate as EmailValidate
 
@@ -94,6 +95,21 @@ instance FromJSON EmailAddress where
                         Left err -> fail $ "Failed to parse email address: " <> err
                         Right email -> return email
     {-# INLINE parseJSON #-}
+
+-- | See 'emailAddressFromText' and 'toText'.
+--
+-- >>> fmap toText $ fromPathPiece "foo@gmail.com"
+-- Just "foo@gmail.com"
+-- >>> fmap toText $ fromPathPiece "this is not an email address"
+-- Nothing
+-- >>> toPathPiece $ unsafeEmailAddress "foo" "gmail.com"
+-- "foo@gmail.com"
+instance PathPiece EmailAddress where
+    fromPathPiece :: Text -> Maybe EmailAddress
+    fromPathPiece = emailAddressFromText
+
+    toPathPiece :: EmailAddress -> Text
+    toPathPiece = toText
 
 -- | Treat 'EmailAddress' just like a 'Text' value.
 --

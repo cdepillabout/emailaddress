@@ -24,6 +24,7 @@ library
                      , email-validate >= 2
                      , http-api-data >= 0.2
                      , opaleye >= 0.4
+                     , path-pieces >= 0.2
                      , persistent >= 2
                      , postgresql-simple >= 0.5
                      , product-profunctors >= 0.6
