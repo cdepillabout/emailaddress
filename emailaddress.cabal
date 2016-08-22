@@ -1,5 +1,5 @@
 name:                emailaddress
-version:             0.1.2.0
+version:             0.1.3.0
 synopsis:            Wrapper around email-validate library adding instances for common type classes.
 description:         Please see README.md
 homepage:            https://github.com/cdepillabout/emailaddress#readme
