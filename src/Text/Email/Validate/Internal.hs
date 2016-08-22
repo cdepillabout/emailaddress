@@ -42,6 +42,9 @@ import GHC.Generics (Generic)
 import Opaleye
     ( Column, Constant(..), PGText, QueryRunnerColumn
     , QueryRunnerColumnDefault(..) , fieldQueryRunnerColumn )
+import Text.Read (Read(readPrec), ReadPrec)
+import Web.HttpApiData
+    ( FromHttpApiData(parseUrlPiece), ToHttpApiData(toUrlPiece) )
 
 import qualified "email-validate" Text.Email.Validate as EmailValidate
 
@@ -51,13 +54,9 @@ newtype EmailAddress = EmailAddress
     { unEmailAddress :: EmailValidate.EmailAddress }
     deriving (Data, Eq, Generic, Ord, Typeable)
 
-instance Show EmailAddress where
-    show :: EmailAddress -> String
-    show = show . unEmailAddress
-
-instance QueryRunnerColumnDefault PGText EmailAddress where
-    queryRunnerColumnDefault :: QueryRunnerColumn PGText EmailAddress
-    queryRunnerColumnDefault = fieldQueryRunnerColumn
+instance Default Constant EmailAddress (Column PGText) where
+    def :: Constant EmailAddress (Column PGText)
+    def = lmap (decodeUtf8With lenientDecode . toByteString) def
 
 instance FromField EmailAddress where
     fromField :: FieldParser EmailAddress
@@ -69,11 +68,25 @@ instance FromField EmailAddress where
         err = returnError ConversionFailed field $
             "Could not convert " <> show email <> " to email address"
 
-instance Default Constant EmailAddress (Column PGText) where
-    def :: Constant EmailAddress (Column PGText)
-    def = lmap (decodeUtf8With lenientDecode . toByteString) def
+-- | This instance assumes 'EmailAddress' is UTF8-encoded.  See
+-- 'validateFromText'.
+--
+-- >>> import Data.Either (isLeft)
+-- >>> toText <$> parseUrlPiece "foo@gmail.com"
+-- Right "foo@gmail.com"
+-- >>> isLeft $ (parseUrlPiece "not an email address" :: Either Text EmailAddress)
+-- True
+instance FromHttpApiData EmailAddress where
+    parseUrlPiece :: Text -> Either Text EmailAddress
+    parseUrlPiece = first pack . validateFromText
 
 -- | Parse 'EmailAddress' from JSON.
+--
+-- >>> import Data.Aeson (decode)
+-- >>> fmap toText <$> (decode "[ \"foo@gmail.com \" ]" :: Maybe [EmailAddress])
+-- Just ["foo@gmail.com"]
+-- >>> decode "[ \"not an email address\" ]" :: Maybe [EmailAddress]
+-- Nothing
 instance FromJSON EmailAddress where
     parseJSON :: Value -> Parser EmailAddress
     parseJSON = withText "EmailAddress" $ \t ->
@@ -82,12 +95,18 @@ instance FromJSON EmailAddress where
                         Right email -> return email
     {-# INLINE parseJSON #-}
 
--- | Turn 'EmailAddress' into JSON.
-instance ToJSON EmailAddress where
-    toJSON :: EmailAddress -> Value
-    toJSON = String . decodeUtf8With lenientDecode . toByteString
-
 -- | Treat 'EmailAddress' just like a 'Text' value.
+--
+-- >>> import Data.Either (isLeft)
+-- >>> import Database.Persist.Types (PersistValue(PersistBool, PersistText))
+-- >>> toPersistValue $ unsafeEmailAddress "foo" "gmail.com"
+-- PersistText "foo@gmail.com"
+-- >>> toText <$> fromPersistValue (PersistText "foo@gmail.com")
+-- Right "foo@gmail.com"
+-- >>> isLeft (fromPersistValue (PersistText "not an email address") :: Either Text EmailAddress)
+-- True
+-- >>> isLeft (fromPersistValue (PersistBool False) :: Either Text EmailAddress)
+-- True
 instance PersistField EmailAddress where
     toPersistValue :: EmailAddress -> PersistValue
     toPersistValue = toPersistValue . toText
@@ -96,9 +115,45 @@ instance PersistField EmailAddress where
     fromPersistValue = first pack . validateFromText <=< fromPersistValue
 
 -- | Treat 'EmailAddress' just like a 'Text' value.
+--
+-- >>> sqlType (Proxy :: Proxy EmailAddress)
+-- SqlString
 instance PersistFieldSql EmailAddress where
     sqlType :: Proxy EmailAddress -> SqlType
     sqlType _ = sqlType (Proxy :: Proxy Text)
+
+instance QueryRunnerColumnDefault PGText EmailAddress where
+    queryRunnerColumnDefault :: QueryRunnerColumn PGText EmailAddress
+    queryRunnerColumnDefault = fieldQueryRunnerColumn
+
+-- |
+-- >>> toText $ read "\"foo@gmail.com\""
+-- "foo@gmail.com"
+instance Read EmailAddress where
+    readPrec :: ReadPrec EmailAddress
+    readPrec = EmailAddress <$> readPrec
+
+-- |
+-- >>> show $ unsafeEmailAddress "foo" "gmail.com"
+-- "\"foo@gmail.com\""
+instance Show EmailAddress where
+    show :: EmailAddress -> String
+    show = show . unEmailAddress
+
+-- | Turn 'EmailAddress' into JSON.
+--
+-- >>> toJSON $ unsafeEmailAddress "foo" "gmail.com"
+-- String "foo@gmail.com"
+instance ToJSON EmailAddress where
+    toJSON :: EmailAddress -> Value
+    toJSON = String . decodeUtf8With lenientDecode . toByteString
+
+-- | This instance assumes 'EmailAddress' is UTF8-encoded.  See 'toText'.
+--
+-- >>> toUrlPiece $ unsafeEmailAddress "foo" "gmail.com"
+-- "foo@gmail.com"
+instance ToHttpApiData EmailAddress where
+      toUrlPiece = toText
 
 -- | Wrapper around 'EmailValidate.validate'.
 --
