@@ -19,6 +19,7 @@ library
   other-modules:       Text.Email.Validate.Internal
   build-depends:       base >= 4.6 && < 5
                      , aeson >= 0.9
+                     , bifunctors >= 5
                      , bytestring >= 0.9
                      , email-validate >= 2
                      , opaleye >= 0.4
