@@ -85,17 +85,17 @@ matrix:
   #   compiler: ": #stack 7.10.2 osx"
   #   os: osx
 
-  - env: BUILD=stack ARGS="--resolver lts-5"
-    compiler: ": #stack 7.10.3 (lts-5) osx"
-    os: osx
+  # - env: BUILD=stack ARGS="--resolver lts-5"
+  #   compiler: ": #stack 7.10.3 (lts-5) osx"
+  #   os: osx
 
-  - env: BUILD=stack ARGS="--resolver lts-6"
-    compiler: ": #stack 7.10.3 (lts-6) osx"
-    os: osx
+  # - env: BUILD=stack ARGS="--resolver lts-6"
+  #   compiler: ": #stack 7.10.3 (lts-6) osx"
+  #   os: osx
 
-  - env: BUILD=stack ARGS="--resolver nightly"
-    compiler: ": #stack nightly osx"
-    os: osx
+  # - env: BUILD=stack ARGS="--resolver nightly"
+  #   compiler: ": #stack nightly osx"
+  #   os: osx
 
   allow_failures:
   - env: BUILD=cabal GHCVER=head  CABALVER=head
