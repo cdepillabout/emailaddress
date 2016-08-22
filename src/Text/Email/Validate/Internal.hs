@@ -72,7 +72,7 @@ instance FromField EmailAddress where
 -- 'validateFromText'.
 --
 -- >>> import Data.Either (isLeft)
--- >>> toText <$> parseUrlPiece "foo@gmail.com"
+-- >>> fmap toText $ parseUrlPiece "foo@gmail.com"
 -- Right "foo@gmail.com"
 -- >>> isLeft $ (parseUrlPiece "not an email address" :: Either Text EmailAddress)
 -- True
@@ -83,7 +83,7 @@ instance FromHttpApiData EmailAddress where
 -- | Parse 'EmailAddress' from JSON.
 --
 -- >>> import Data.Aeson (decode)
--- >>> fmap toText <$> (decode "[ \"foo@gmail.com \" ]" :: Maybe [EmailAddress])
+-- >>> fmap (fmap toText) (decode "[ \"foo@gmail.com \" ]" :: Maybe [EmailAddress])
 -- Just ["foo@gmail.com"]
 -- >>> decode "[ \"not an email address\" ]" :: Maybe [EmailAddress]
 -- Nothing
@@ -101,7 +101,7 @@ instance FromJSON EmailAddress where
 -- >>> import Database.Persist.Types (PersistValue(PersistBool, PersistText))
 -- >>> toPersistValue $ unsafeEmailAddress "foo" "gmail.com"
 -- PersistText "foo@gmail.com"
--- >>> toText <$> fromPersistValue (PersistText "foo@gmail.com")
+-- >>> fmap toText $ fromPersistValue (PersistText "foo@gmail.com")
 -- Right "foo@gmail.com"
 -- >>> isLeft (fromPersistValue (PersistText "not an email address") :: Either Text EmailAddress)
 -- True
@@ -131,7 +131,7 @@ instance QueryRunnerColumnDefault PGText EmailAddress where
 -- "foo@gmail.com"
 instance Read EmailAddress where
     readPrec :: ReadPrec EmailAddress
-    readPrec = EmailAddress <$> readPrec
+    readPrec = fmap EmailAddress readPrec
 
 -- |
 -- >>> show $ unsafeEmailAddress "foo" "gmail.com"
