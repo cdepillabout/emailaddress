@@ -2,7 +2,10 @@
 emailaddress
 ============
 
-[![Hackage](https://img.shields.io/hackage/v/emailaddress.svg)](https://hackage.haskell.org/package/emailaddress) [![Build Status](https://secure.travis-ci.org/cdepillabout/emailaddress.svg)](http://travis-ci.org/cdepillabout/emailaddress)
+[![Build Status](https://secure.travis-ci.org/cdepillabout/emailaddress.svg)](http://travis-ci.org/cdepillabout/emailaddress)
+[![Hackage](https://img.shields.io/hackage/v/emailaddress.svg)](https://hackage.haskell.org/package/emailaddress)
+[![Stackage LTS](http://stackage.org/package/emailaddress/badge/lts)](http://stackage.org/lts/package/emailaddress)
+[![Stackage Nightly](http://stackage.org/package/emailaddress/badge/nightly)](http://stackage.org/nightly/package/emailaddress)
 
 This Haskell module wraps around the
 [`email-validate`](https://hackage.haskell.org/package/email-validate) package,
