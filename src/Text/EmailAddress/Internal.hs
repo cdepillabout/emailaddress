@@ -3,10 +3,9 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE PackageImports #-}
 
-module Text.Email.Validate.Internal
-    ( EmailAddress(unEmailAddress)
+module Text.EmailAddress.Internal
+    ( EmailAddress(EmailAddress, unEmailAddress)
     , EmailValidate.isValid
     , EmailValidate.canonicalizeEmail
     , emailAddress
@@ -49,7 +48,7 @@ import Web.HttpApiData
     ( FromHttpApiData(parseUrlPiece), ToHttpApiData(toUrlPiece) )
 import Web.PathPieces (PathPiece(fromPathPiece, toPathPiece))
 
-import qualified "email-validate" Text.Email.Validate as EmailValidate
+import qualified Text.Email.Validate as EmailValidate
 
 -- | Type to represent an email address.  Newtype wrapper around
 -- 'EmailValidate.EmailAddress' with additional typeclass instances.

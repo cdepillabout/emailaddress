@@ -1,5 +1,5 @@
 name:                emailaddress
-version:             0.1.6.0
+version:             0.2.0.0
 synopsis:            Wrapper around email-validate library adding instances for common type classes.
 description:         Please see README.md
 homepage:            https://github.com/cdepillabout/emailaddress#readme
@@ -11,12 +11,13 @@ copyright:           2016 Dennis Gosnell
 category:            Text
 build-type:          Simple
 extra-source-files:  README.md
+                   , CHANGELOG.md
 cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Text.Email.Validate
-  other-modules:       Text.Email.Validate.Internal
+  exposed-modules:     Text.EmailAddress
+  other-modules:       Text.EmailAddress.Internal
   build-depends:       base >= 4.6 && < 5
                      , aeson >= 0.9
                      , bifunctors >= 5

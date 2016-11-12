@@ -13,8 +13,8 @@ and
 [FromJSON](https://hackage.haskell.org/package/aeson/docs/Data-Aeson.html#t:FromJSON).
 This allows us to use the `EmailAddress` type without fear of orphan instances.
 
-This package exposes the module `Text.Email.Validate`, so it can be used as
-a drop-in replacement for
+This package exposes the module `Text.EmailAddress`. It can be used as a
+drop-in replacement for
 [`email-validate`](https://hackage.haskell.org/package/email-validate).
 
 If you would like to add new instances for `EmailAddress`, please send a pull

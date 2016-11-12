@@ -1,5 +1,5 @@
 {-|
-Module      : Text.Email.Validate
+Module      : Text.EmailAddress
 Description : Wrapper around email-validate adding additional instances.
 Copyright   : (c) Dennis Gosnell, 2016
 License     : BSD3
@@ -20,9 +20,9 @@ instances will be accepted for any typeclass from any package available on
 stackage.
 -}
 
-module Text.Email.Validate
+module Text.EmailAddress
     ( -- * Data Type
-      EmailAddress
+      EmailAddress(EmailAddress, unEmailAddress)
       -- * Create EmailAddress
     , emailAddress
     , validate
@@ -44,8 +44,8 @@ module Text.Email.Validate
     , unsafeEmailAddress
     ) where
 
-import Text.Email.Validate.Internal
-    ( EmailAddress, canonicalizeEmail, domainPart, emailAddress
-    , emailAddressFromString, emailAddressFromText, isValid, localPart
-    , toByteString, toText, validate, validateFromString, validateFromText
-    , unsafeEmailAddress )
+import Text.EmailAddress.Internal
+       (EmailAddress(EmailAddress, unEmailAddress), canonicalizeEmail,
+        domainPart, emailAddress, emailAddressFromString,
+        emailAddressFromText, isValid, localPart, toByteString, toText,
+        validate, validateFromString, validateFromText, unsafeEmailAddress)
